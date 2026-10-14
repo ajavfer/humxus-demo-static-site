@@ -1,0 +1,6 @@
+# Redirects for clean URLs
+/user /user.html 200
+/master /master.html 200
+/partner /partner.html 200
+/login /login.html 200
+/signup /signup.html 200

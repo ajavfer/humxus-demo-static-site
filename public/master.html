@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Security Headers -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000, must-revalidate">
+
+    <title data-i18n="auto.master.113_c16342b9">HumXus - Master Dashboard</title>
+
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://unpkg.com/;
+        style-src 'self' 'unsafe-inline' https://unpkg.com/;
+        img-src 'self' data: https:;
+        font-src 'self' https:;
+        connect-src 'self' https://nominatim.openstreetmap.org/;
+        child-src 'self';
+        object-src 'none';
+        media-src 'self' https:;
+        frame-src 'none';
+        form-action 'self';
+    ">
+
+    <!-- Custom CSS -->
+        <!-- Favicon -->
+        <link rel="icon" href="/static/images/HumXus_logo.png" type="image/png">
+            <link rel="stylesheet" href="/static/css/style.css" id="main-css">
+    <style>
+        body {
+            background-color: #f8f9fa !important;
+        }
+
+        .master-dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .dashboard-header h1 {
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .dashboard-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .action-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .action-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .action-card h3 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .action-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .humanoids-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .humanoid-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .humanoid-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .humanoid-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .humanoid-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .humanoid-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-booked {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-maintenance {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .humanoid-content {
+            padding: 1.5rem;
+        }
+
+        .humanoid-specs {
+            margin-bottom: 1.5rem;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .spec-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .spec-value {
+            color: #666;
+        }
+
+        .firmware-modules {
+            margin-bottom: 1.5rem;
+        }
+
+        .module-tag {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .humanoid-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            color: white;
+        }
+
+        .earnings-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .earnings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .earnings-total {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .earnings-period {
+            color: #666;
+        }
+
+        .earnings-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .earning-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .earning-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 0.5rem;
+        }
+
+        .earning-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .schedule-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .schedule-item {
+            border-bottom: 1px solid #e1e5e9;
+            padding: 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-info h4 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .schedule-info p {
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .master-dashboard {
+                padding: 1rem;
+            }
+
+            .dashboard-header {
+                padding: 1.5rem;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid,
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .humanoids-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .earnings-breakdown {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-left">
+                <ul>
+                    <li><a href="/index.html" class="nav-home"><img src="/static/images/HumXus_logo.png" alt="HumXus" data-i18n-alt="home.brand"></a></li>
+                    <li><a href="/user.html" class="nav-user" data-i18n="nav.user">User</a></li>
+                    <li><a href="/master.html" class="nav-master" data-i18n="nav.master">Master</a></li>
+                    <li><a href="/partner.html" class="nav-partner" data-i18n="nav.partner">Partner</a></li>
+                </ul>
+            </div>
+
+            <button class="hamburger-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-menu" data-i18n-aria="nav.menu.toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="nav-right">
+                <ul>
+                    <li><a href="/login.html" class="nav-login" data-i18n="nav.login">Login</a></li>
+                    <li><a href="/signup.html" class="btn-signup nav-signup" data-i18n="nav.signup">Sign up</a></li>
+                    <li class="language-dropdown" id="language-dropdown">
+                        <a href="#language" class="language-icon" aria-haspopup="true" aria-expanded="false">🌐</a>
+                        <div class="dropdown-content" role="menu" aria-label="Language selector" data-i18n-aria="nav.language.selector">
+                            <a href="#" class="language-option active" data-lang="en" role="menuitem" tabindex="0"><span data-i18n="auto._header.3_b3310cb4">English</span></a>
+                            <a href="#" class="language-option" data-lang="yue" role="menuitem" tabindex="0"><span data-i18n="auto._header.2_33e28f52">Cantonese (廣州話)</span></a>
+                            <a href="#" class="language-option" data-lang="zh" role="menuitem" tabindex="0"><span data-i18n="auto._header.1_99c47543">Putonghua (普通话)</span></a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <ul id="mobile-menu" class="mobile-menu">
+                <li><a href="/index.html" class="nav-home"><img src="/static/images/HumXus_logo.png" alt="HumXus" data-i18n-alt="home.brand"></a></li>
+                <li><a href="/user.html" class="nav-user" data-i18n="nav.user">User</a></li>
+                <li><a href="/master.html" class="nav-master" data-i18n="nav.master">Master</a></li>
+                <li><a href="/partner.html" class="nav-partner" data-i18n="nav.partner">Partner</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+    <main class="master-dashboard">
+        <div class="dashboard-header">
+            <h1 data-i18n="master.header.title">Master Control Center</h1>
+            <p data-i18n="master.header.subtitle">Manage your humanoid assets and maximize your earnings</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label"><span data-i18n="auto.master.112_cd3f8bbb">Total Humanoids</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-value">6</div>
+                <div class="stat-label"><span data-i18n="auto.master.111_8052264e">Active Bookings</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-value"><span data-i18n="auto.master.110_327e0ef0">HKD 45,200</span></div>
+                <div class="stat-label"><span data-i18n="auto.master.109_3bf520ac">Monthly Earnings</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-value">4.8</div>
+                <div class="stat-label" data-i18n="master.stats.avgRating">Average Rating</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <div class="action-card">
+                <span class="icon">🤖</span>
+                <h3 data-i18n="master.actions.add.title">Add New Humanoid</h3>
+                <p data-i18n="master.actions.add.desc">List a new humanoid asset on the platform with specifications and firmware capabilities</p>
+                <a href="#add-humanoid" class="btn-primary" data-i18n="master.actions.add.cta">Add Humanoid</a>
+            </div>
+
+            <div class="action-card">
+                <span class="icon">📅</span>
+                <h3 data-i18n="master.actions.schedule.title">Manage Schedule</h3>
+                <p data-i18n="master.actions.schedule.desc">Set availability, manage bookings, and optimize your humanoid utilization</p>
+                <a href="#schedule" class="btn-primary" data-i18n="master.actions.schedule.cta">Manage Schedule</a>
+            </div>
+
+            <div class="action-card">
+                <span class="icon">⚙️</span>
+                <h3 data-i18n="master.actions.firmware.title">Firmware Updates</h3>
+                <p><span data-i18n="auto.master.108_ac99c835">Install new skill modules and maintain your humanoids' capabilities</span></p>
+                <a href="#firmware" class="btn-primary"><span data-i18n="auto.master.107_39f0383d">Update Firmware</span></a>
+            </div>
+
+            <div class="action-card">
+                <span class="icon">📊</span>
+                <h3><span data-i18n="auto.master.106_5d8130b4">Analytics & Reports</span></h3>
+                <p><span data-i18n="auto.master.105_7af3284d">Track performance, earnings, and optimize your business strategy</span></p>
+                <a href="#analytics" class="btn-primary"><span data-i18n="auto.master.104_87985b40">View Analytics</span></a>
+            </div>
+        </div>
+
+        <section class="humanoids-grid">
+            <div class="humanoid-card">
+                <div class="humanoid-header">
+                    <div class="humanoid-title"><span data-i18n="auto.master.103_25144aa6">HSP-001 - General Purpose Unit</span></div>
+                    <span class="humanoid-status status-booked"><span data-i18n="auto.master.102_8f37f3ca">Currently Booked</span></span>
+                </div>
+                <div class="humanoid-content">
+                    <div class="humanoid-specs">
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.101_b1e29c17">Model:</span></span>
+                            <span class="spec-value"><span data-i18n="auto.master.100_12c580c7">Atlas X1</span></span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.99_425528f6">Battery Life:</span></span>
+                            <span class="spec-value"><span data-i18n="auto.master.98_39d1e6ea">12 hours</span></span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.97_c6abd68e">Payload Capacity:</span></span>
+                            <span class="spec-value">50kg</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.96_621d810e">Current Rating:</span></span>
+                            <span class="spec-value">★★★★★ (4.9)</span>
+                        </div>
+                    </div>
+
+                    <div class="firmware-modules">
+                        <div class="module-tag"><span data-i18n="auto.master.95_bf682beb">Food Service</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.94_6b49b7f9">Hospitality</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.93_c0f2de42">Basic Assistance</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.92_0a517117">Cantonese</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.91_ce9e89c6">English</span></div>
+                    </div>
+
+                    <div class="humanoid-actions">
+                        <a href="#edit" class="btn-secondary"><span data-i18n="auto.master.90_cddec94a">Edit Specs</span></a>
+                        <a href="#schedule" class="btn-secondary"><span data-i18n="auto.master.89_455ae6a0">View Schedule</span></a>
+                        <a href="#maintenance" class="btn-secondary"><span data-i18n="auto.master.88_40920542">Maintenance</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="humanoid-card">
+                <div class="humanoid-header">
+                    <div class="humanoid-title"><span data-i18n="auto.master.87_391153e6">HSP-002 - Heavy Duty Unit</span></div>
+                    <span class="humanoid-status status-available"><span data-i18n="auto.master.86_978b3ad3">Available</span></span>
+                </div>
+                <div class="humanoid-content">
+                    <div class="humanoid-specs">
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.85_b1e29c17">Model:</span></span>
+                            <span class="spec-value"><span data-i18n="auto.master.84_87f01153">Atlas X2 Heavy</span></span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.83_425528f6">Battery Life:</span></span>
+                            <span class="spec-value"><span data-i18n="auto.master.82_878b2545">16 hours</span></span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.81_c6abd68e">Payload Capacity:</span></span>
+                            <span class="spec-value">100kg</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.80_621d810e">Current Rating:</span></span>
+                            <span class="spec-value">★★★★☆ (4.2)</span>
+                        </div>
+                    </div>
+
+                    <div class="firmware-modules">
+                        <div class="module-tag"><span data-i18n="auto.master.79_1a43c0e3">Logistics</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.78_ca81def4">Warehousing</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.77_4f04249a">Heavy Lifting</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.76_94e9ca2c">Inventory Mgmt</span></div>
+                    </div>
+
+                    <div class="humanoid-actions">
+                        <a href="#edit" class="btn-secondary"><span data-i18n="auto.master.75_cddec94a">Edit Specs</span></a>
+                        <a href="#schedule" class="btn-secondary"><span data-i18n="auto.master.74_455ae6a0">View Schedule</span></a>
+                        <a href="#maintenance" class="btn-secondary"><span data-i18n="auto.master.73_40920542">Maintenance</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="humanoid-card">
+                <div class="humanoid-header">
+                    <div class="humanoid-title"><span data-i18n="auto.master.72_2c5de33d">HSP-003 - Care Specialist</span></div>
+                    <span class="humanoid-status status-booked"><span data-i18n="auto.master.71_8f37f3ca">Currently Booked</span></span>
+                </div>
+                <div class="humanoid-content">
+                    <div class="humanoid-specs">
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.70_b1e29c17">Model:</span></span>
+                            <span class="spec-value"><span data-i18n="auto.master.69_3ff4ace5">Atlas Care-1</span></span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.68_425528f6">Battery Life:</span></span>
+                            <span class="spec-value"><span data-i18n="auto.master.67_d1ecfa60">14 hours</span></span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.66_c6abd68e">Payload Capacity:</span></span>
+                            <span class="spec-value">30kg</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.65_621d810e">Current Rating:</span></span>
+                            <span class="spec-value">★★★★★ (4.8)</span>
+                        </div>
+                    </div>
+
+                    <div class="firmware-modules">
+                        <div class="module-tag"><span data-i18n="auto.master.64_ff22070c">Elderly Care</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.63_cb39a885">Medical Monitoring</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.62_4b31c512">Mobility Assist</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.61_cc689a28">Companionship</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.60_0a517117">Cantonese</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.59_ce9e89c6">English</span></div>
+                    </div>
+
+                    <div class="humanoid-actions">
+                        <a href="#edit" class="btn-secondary"><span data-i18n="auto.master.58_cddec94a">Edit Specs</span></a>
+                        <a href="#schedule" class="btn-secondary"><span data-i18n="auto.master.57_455ae6a0">View Schedule</span></a>
+                        <a href="#maintenance" class="btn-secondary"><span data-i18n="auto.master.56_40920542">Maintenance</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="humanoid-card">
+                <div class="humanoid-header">
+                    <div class="humanoid-title"><span data-i18n="auto.master.55_b688c423">HSP-004 - Entertainment Unit</span></div>
+                    <span class="humanoid-status status-maintenance"><span data-i18n="auto.master.54_40920542">Maintenance</span></span>
+                </div>
+                <div class="humanoid-content">
+                    <div class="humanoid-specs">
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.53_b1e29c17">Model:</span></span>
+                            <span class="spec-value"><span data-i18n="auto.master.52_1af9d3a0">Atlas Performer-1</span></span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.51_425528f6">Battery Life:</span></span>
+                            <span class="spec-value"><span data-i18n="auto.master.50_a6d5a659">10 hours</span></span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.49_c6abd68e">Payload Capacity:</span></span>
+                            <span class="spec-value">25kg</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><span data-i18n="auto.master.48_621d810e">Current Rating:</span></span>
+                            <span class="spec-value">★★★★☆ (4.5)</span>
+                        </div>
+                    </div>
+
+                    <div class="firmware-modules">
+                        <div class="module-tag"><span data-i18n="auto.master.47_8f13be53">Entertainment</span></div>
+                        <div class="module-tag">Music</div>
+                        <div class="module-tag">Dance</div>
+                        <div class="module-tag"><span data-i18n="auto.master.46_4dece644">Interactive</span></div>
+                        <div class="module-tag"><span data-i18n="auto.master.45_065b225d">Multiple Languages</span></div>
+                    </div>
+
+                    <div class="humanoid-actions">
+                        <a href="#edit" class="btn-secondary"><span data-i18n="auto.master.44_cddec94a">Edit Specs</span></a>
+                        <a href="#schedule" class="btn-secondary"><span data-i18n="auto.master.43_455ae6a0">View Schedule</span></a>
+                        <a href="#maintenance" class="btn-secondary"><span data-i18n="auto.master.42_40920542">Maintenance</span></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="earnings-section">
+            <div class="earnings-header">
+                <div>
+                    <div class="earnings-total"><span data-i18n="auto.master.41_327e0ef0">HKD 45,200</span></div>
+                    <div class="earnings-period"><span data-i18n="auto.master.40_4b84a8e9">This Month</span></div>
+                </div>
+                <a href="#full-report" class="btn-primary"><span data-i18n="auto.master.39_845eae4d">View Full Report</span></a>
+            </div>
+
+            <div class="earnings-breakdown">
+                <div class="earning-item">
+                    <div class="earning-amount"><span data-i18n="auto.master.38_20400bc4">HKD 28,500</span></div>
+                    <div class="earning-label"><span data-i18n="auto.master.37_6de9ce7c">Service Revenue</span></div>
+                </div>
+
+                <div class="earning-item">
+                    <div class="earning-amount"><span data-i18n="auto.master.36_53183abf">HKD 12,800</span></div>
+                    <div class="earning-label"><span data-i18n="auto.master.35_0103148c">Premium Bookings</span></div>
+                </div>
+
+                <div class="earning-item">
+                    <div class="earning-amount"><span data-i18n="auto.master.34_cd8538e3">HKD 2,400</span></div>
+                    <div class="earning-label"><span data-i18n="auto.master.33_d9bb9380">Platform Fees</span></div>
+                </div>
+
+                <div class="earning-item">
+                    <div class="earning-amount"><span data-i18n="auto.master.32_fad7e230">HKD 1,500</span></div>
+                    <div class="earning-label"><span data-i18n="auto.master.31_7075a813">Maintenance Costs</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="schedule-section">
+            <h2 style="margin-bottom: 2rem; color: #333;"><span data-i18n="auto.master.30_63382d38">Upcoming Schedule</span></h2>
+
+            <div class="schedule-item">
+                <div class="schedule-info">
+                    <h4><span data-i18n="auto.master.29_cc538def">HSP-001 - Food Service at Central Restaurant</span></h4>
+                    <p><strong>Date:</strong><span data-i18n="auto.master.28_69ec6d90">December 15-16, 2025</span></p>
+                    <p><strong><span data-i18n="auto.master.27_f8974a14">Location:</span></strong><span data-i18n="auto.master.26_d478ce99">Central, Hong Kong</span></p>
+                    <p><strong><span data-i18n="auto.master.25_a7772c2a">Earnings:</span></strong><span data-i18n="auto.master.24_5e136c54">HKD 4,000</span></p>
+                </div>
+                <div class="booking-status status-active"><span data-i18n="auto.master.23_973634e4">Confirmed</span></div>
+            </div>
+
+            <div class="schedule-item">
+                <div class="schedule-info">
+                    <h4><span data-i18n="auto.master.22_46865d97">HSP-003 - Elderly Care at Harmony Home</span></h4>
+                    <p><strong>Date:</strong><span data-i18n="auto.master.21_4b6afa85">December 18-20, 2025</span></p>
+                    <p><strong><span data-i18n="auto.master.20_f8974a14">Location:</span></strong><span data-i18n="auto.master.19_1e5d8d0c">Kowloon, Hong Kong</span></p>
+                    <p><strong><span data-i18n="auto.master.18_a7772c2a">Earnings:</span></strong><span data-i18n="auto.master.17_3dbf31f7">HKD 6,600</span></p>
+                </div>
+                <div class="booking-status status-active"><span data-i18n="auto.master.16_973634e4">Confirmed</span></div>
+            </div>
+
+            <div class="schedule-item">
+                <div class="schedule-info">
+                    <h4><span data-i18n="auto.master.15_392c17c4">HSP-002 - Logistics Support at Warehouse Hub</span></h4>
+                    <p><strong>Date:</strong><span data-i18n="auto.master.14_7e045bb2">December 22-25, 2025</span></p>
+                    <p><strong><span data-i18n="auto.master.13_f8974a14">Location:</span></strong><span data-i18n="auto.master.12_f0e4aa1e">Kwai Chung, Hong Kong</span></p>
+                    <p><strong><span data-i18n="auto.master.11_a7772c2a">Earnings:</span></strong><span data-i18n="auto.master.10_58be46ae">HKD 3,600</span></p>
+                </div>
+                <div class="booking-status status-pending"><span data-i18n="auto.master.9_0b242216">Pending Approval</span></div>
+            </div>
+
+            <div class="schedule-item">
+                <div class="schedule-info">
+                    <h4><span data-i18n="auto.master.8_60c7c6e3">HSP-004 - Entertainment at Annual Gala</span></h4>
+                    <p><strong>Date:</strong><span data-i18n="auto.master.7_cedace54">December 28, 2025</span></p>
+                    <p><strong><span data-i18n="auto.master.6_f8974a14">Location:</span></strong><span data-i18n="auto.master.5_89e0742a">Wan Chai, Hong Kong</span></p>
+                    <p><strong><span data-i18n="auto.master.4_a7772c2a">Earnings:</span></strong><span data-i18n="auto.master.3_a6c12a01">HKD 2,500</span></p>
+                </div>
+                <div class="booking-status status-pending"><span data-i18n="auto.master.2_0f7c711c">Awaiting Maintenance</span></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><span data-i18n="auto.master.1_d8f519f6">@HumXus 2025 - Humanoid Services Platform</span></p>
+    </footer>
+
+    <!-- i18n and Custom JavaScript -->
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/script.js"></script>
+    <script>const currentPage = 'master'; document.querySelectorAll('.nav-left a, .nav-right a, #mobile-menu a').forEach(link => { if (link.classList.contains('nav-' + currentPage)) { link.classList.add('active'); } });</script>
+</body>
+</html>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Security headers are set on the HTTP response by the Flask server (see app.py @after_request).
+        meta http-equiv for X-Frame-Options / X-XSS-Protection / X-Content-Type-Options is ineffective
+        in modern browsers and has been removed to avoid DevTools warnings. Cache-Control for static
+        assets is managed server-side and static files are versioned with the ?v={{ static_version }} query.
+    -->
+
+    <title data-i18n="auto.partner.86_899b805a">HumXus - Partner Dashboard</title>
+
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://unpkg.com/;
+        style-src 'self' 'unsafe-inline' https://unpkg.com/;
+        img-src 'self' data: https:;
+        font-src 'self' https:;
+        connect-src 'self' https://nominatim.openstreetmap.org/;
+        child-src 'self';
+        object-src 'none';
+        media-src 'self' https:;
+        frame-src 'none';
+        form-action 'self';
+    ">
+
+    <!-- Custom CSS -->
+        <!-- Favicon -->
+        <link rel="icon" href="/static/images/HumXus_logo.png" type="image/png">
+    <link rel="stylesheet" href="/static/css/style.css" id="main-css">
+    <style>
+        body {
+            background-color: #f8f9fa !important;
+        }
+
+        .partner-dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .dashboard-header h1 {
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .dashboard-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .partner-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .action-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .action-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .action-card h3 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .action-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .firmware-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .firmware-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .firmware-card {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .firmware-card:hover {
+            border-color: #28a745;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.1);
+        }
+
+        .firmware-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .firmware-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .firmware-version {
+            background: #28a745;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .firmware-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .firmware-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .firmware-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            color: white;
+        }
+
+        .hardware-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .hardware-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .hardware-card {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .hardware-card:hover {
+            border-color: #28a745;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.1);
+        }
+
+        .hardware-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .hardware-content {
+            padding: 1.5rem;
+        }
+
+        .hardware-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .hardware-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .hardware-specs {
+            margin-bottom: 1.5rem;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .spec-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .spec-value {
+            color: #666;
+        }
+
+        .compatibility-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .compatibility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .compatibility-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .compatibility-item.compatible {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .compatibility-item.incompatible {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .compatibility-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .compatibility-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .analytics-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .analytics-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .partner-dashboard {
+                padding: 1rem;
+            }
+
+            .dashboard-header {
+                padding: 1.5rem;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid,
+            .partner-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .firmware-grid,
+            .hardware-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compatibility-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .analytics-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-left">
+                <ul>
+                    <li><a href="/index.html" class="nav-home"><img src="/static/images/HumXus_logo.png" alt="HumXus" data-i18n-alt="home.brand"></a></li>
+                    <li><a href="/user.html" class="nav-user" data-i18n="nav.user">User</a></li>
+                    <li><a href="/master.html" class="nav-master" data-i18n="nav.master">Master</a></li>
+                    <li><a href="/partner.html" class="nav-partner" data-i18n="nav.partner">Partner</a></li>
+                </ul>
+            </div>
+
+            <button class="hamburger-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-menu" data-i18n-aria="nav.menu.toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="nav-right">
+                <ul>
+                    <li><a href="/login.html" class="nav-login" data-i18n="nav.login">Login</a></li>
+                    <li><a href="/signup.html" class="btn-signup nav-signup" data-i18n="nav.signup">Sign up</a></li>
+                    <li class="language-dropdown" id="language-dropdown">
+                        <a href="#language" class="language-icon" aria-haspopup="true" aria-expanded="false">🌐</a>
+                        <div class="dropdown-content" role="menu" aria-label="Language selector" data-i18n-aria="nav.language.selector">
+                            <a href="#" class="language-option active" data-lang="en" role="menuitem" tabindex="0"><span data-i18n="auto._header.3_b3310cb4">English</span></a>
+                            <a href="#" class="language-option" data-lang="yue" role="menuitem" tabindex="0"><span data-i18n="auto._header.2_33e28f52">Cantonese (廣州話)</span></a>
+                            <a href="#" class="language-option" data-lang="zh" role="menuitem" tabindex="0"><span data-i18n="auto._header.1_99c47543">Putonghua (普通话)</span></a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <ul id="mobile-menu" class="mobile-menu">
+                <li><a href="/index.html" class="nav-home"><img src="/static/images/HumXus_logo.png" alt="HumXus" data-i18n-alt="home.brand"></a></li>
+                <li><a href="/user.html" class="nav-user" data-i18n="nav.user">User</a></li>
+                <li><a href="/master.html" class="nav-master" data-i18n="nav.master">Master</a></li>
+                <li><a href="/partner.html" class="nav-partner" data-i18n="nav.partner">Partner</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+    <main class="partner-dashboard">
+        <div class="dashboard-header">
+            <h1 data-i18n="partner.header.title">Partner Control Center</h1>
+            <p data-i18n="partner.header.subtitle">Manage firmware modules, hardware specifications, and partnership analytics</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">24</div>
+                <div class="stat-label"><span data-i18n="auto.partner.85_9e27196a">Active Firmware Modules</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-value">156</div>
+                <div class="stat-label"><span data-i18n="auto.partner.84_bd3822df">Humanoids Using Your Tech</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-value">89%</div>
+                <div class="stat-label"><span data-i18n="auto.partner.83_126a1dcd">Module Compatibility Rate</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-value">4.7</div>
+                <div class="stat-label" data-i18n="partner.stats.avgRating">Average Module Rating</div>
+            </div>
+        </div>
+
+        <div class="partner-actions">
+            <div class="action-card">
+                <span class="icon">📦</span>
+                <h3 data-i18n="partner.actions.upload.title">Upload Firmware Module</h3>
+                <p data-i18n="partner.actions.upload.desc">Deploy new skill modules to the platform for remote installation on compatible humanoids</p>
+                <a href="#upload-firmware" class="btn-primary" data-i18n="partner.actions.upload.cta">Upload Module</a>
+            </div>
+
+            <div class="action-card">
+                <span class="icon">🔧</span>
+                <h3 data-i18n="partner.actions.hardware.title">Hardware Specifications</h3>
+                <p><span data-i18n="auto.partner.82_3f467455">Register new hardware models and define compatibility requirements</span></p>
+                <a href="#hardware-specs" class="btn-primary"><span data-i18n="auto.partner.81_3ddca264">Add Hardware</span></a>
+            </div>
+
+            <div class="action-card">
+                <span class="icon">📊</span>
+                <h3><span data-i18n="auto.partner.80_6d404052">Performance Analytics</span></h3>
+                <p><span data-i18n="auto.partner.79_e7e211cf">Monitor module performance, user satisfaction, and market adoption</span></p>
+                <a href="#analytics" class="btn-primary"><span data-i18n="auto.partner.78_7a1cd398">View Analytics</span></a>
+            </div>
+
+            <div class="action-card">
+                <span class="icon">🤝</span>
+                <h3><span data-i18n="auto.partner.77_b817b78e">Partnership Portal</span></h3>
+                <p><span data-i18n="auto.partner.76_619de7fa">Access partnership resources, documentation, and support channels</span></p>
+                <a href="#partnership" class="btn-primary"><span data-i18n="auto.partner.75_7279a9f8">Partner Resources</span></a>
+            </div>
+        </div>
+
+        <section class="firmware-section">
+            <h2 style="margin-bottom: 2rem; color: #333;"><span data-i18n="auto.partner.74_6dd19cdb">Firmware Module Library</span></h2>
+            <div class="firmware-grid">
+                <div class="firmware-card">
+                    <div class="firmware-header">
+                        <div class="firmware-name"><span data-i18n="auto.partner.73_a5c5f0a3">Culinary Arts Module</span></div>
+                        <span class="firmware-version"><span data-i18n="auto.partner.72_9883d92f">v2.1.4</span></span>
+                    </div>
+                    <div class="firmware-description" data-i18n="partner.firmware.culinary.desc">
+                        Advanced cooking algorithms, recipe database, food safety protocols, and customer service interactions for restaurant environments.
+                    </div>
+                    <div class="firmware-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">89</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.71_aa0008d6">Active Installs</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">4.8</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.70_47076d7d">User Rating</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">94%</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.69_e2632461">Success Rate</span></div>
+                        </div>
+                    </div>
+                    <div class="firmware-actions">
+                        <a href="#update" class="btn-secondary"><span data-i18n="auto.partner.68_51db28e3">Update</span></a>
+                        <a href="#analytics" class="btn-secondary"><span data-i18n="auto.partner.67_09543bd3">Analytics</span></a>
+                        <a href="#support" class="btn-secondary"><span data-i18n="auto.partner.66_81bdb64d">Support</span></a>
+                    </div>
+                </div>
+
+                <div class="firmware-card">
+                    <div class="firmware-header">
+                        <div class="firmware-name"><span data-i18n="auto.partner.65_d04c55c4">Healthcare Companion</span></div>
+                        <span class="firmware-version"><span data-i18n="auto.partner.64_d6f43432">v1.8.2</span></span>
+                    </div>
+                    <div class="firmware-description" data-i18n="partner.firmware.healthcare.desc">
+                        Medical monitoring, vital signs tracking, medication reminders, mobility assistance, and compassionate care protocols.
+                    </div>
+                    <div class="firmware-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">67</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.63_aa0008d6">Active Installs</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">4.9</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.62_47076d7d">User Rating</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">96%</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.61_e2632461">Success Rate</span></div>
+                        </div>
+                    </div>
+                    <div class="firmware-actions">
+                        <a href="#update" class="btn-secondary"><span data-i18n="auto.partner.60_51db28e3">Update</span></a>
+                        <a href="#analytics" class="btn-secondary"><span data-i18n="auto.partner.59_09543bd3">Analytics</span></a>
+                        <a href="#support" class="btn-secondary"><span data-i18n="auto.partner.58_81bdb64d">Support</span></a>
+                    </div>
+                </div>
+
+                <div class="firmware-card">
+                    <div class="firmware-header">
+                        <div class="firmware-name"><span data-i18n="auto.partner.57_d82acf30">Logistics Optimizer</span></div>
+                        <span class="firmware-version"><span data-i18n="auto.partner.56_b27b360e">v3.0.1</span></span>
+                    </div>
+                    <div class="firmware-description" data-i18n="partner.firmware.logistics.desc">
+                        Warehouse management, inventory tracking, route optimization, and heavy lifting protocols for logistics operations.
+                    </div>
+                    <div class="firmware-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">45</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.55_aa0008d6">Active Installs</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">4.6</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.54_47076d7d">User Rating</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">91%</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.53_e2632461">Success Rate</span></div>
+                        </div>
+                    </div>
+                    <div class="firmware-actions">
+                        <a href="#update" class="btn-secondary"><span data-i18n="auto.partner.52_51db28e3">Update</span></a>
+                        <a href="#analytics" class="btn-secondary"><span data-i18n="auto.partner.51_09543bd3">Analytics</span></a>
+                        <a href="#support" class="btn-secondary"><span data-i18n="auto.partner.50_81bdb64d">Support</span></a>
+                    </div>
+                </div>
+
+                <div class="firmware-card">
+                    <div class="firmware-header">
+                        <div class="firmware-name"><span data-i18n="auto.partner.49_5ef372ec">Entertainment Suite</span></div>
+                        <span class="firmware-version"><span data-i18n="auto.partner.48_b541dedc">v2.4.7</span></span>
+                    </div>
+                    <div class="firmware-description" data-i18n="partner.firmware.entertainment.desc">
+                        Performance algorithms, music generation, dance routines, interactive entertainment, and audience engagement protocols.
+                    </div>
+                    <div class="firmware-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">34</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.47_aa0008d6">Active Installs</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">4.7</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.46_47076d7d">User Rating</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">88%</div>
+                            <div class="stat-label"><span data-i18n="auto.partner.45_e2632461">Success Rate</span></div>
+                        </div>
+                    </div>
+                    <div class="firmware-actions">
+                        <a href="#update" class="btn-secondary"><span data-i18n="auto.partner.44_51db28e3">Update</span></a>
+                        <a href="#analytics" class="btn-secondary"><span data-i18n="auto.partner.43_09543bd3">Analytics</span></a>
+                        <a href="#support" class="btn-secondary"><span data-i18n="auto.partner.42_81bdb64d">Support</span></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="hardware-section">
+            <h2 style="margin-bottom: 2rem; color: #333;"><span data-i18n="auto.partner.41_c1e786ce">Registered Hardware Models</span></h2>
+            <div class="hardware-grid">
+                <div class="hardware-card">
+                    <div class="hardware-image">
+                        <span>🤖</span>
+                    </div>
+                    <div class="hardware-content">
+                        <h3 class="hardware-title"><span data-i18n="auto.partner.40_b1665c04">Atlas X1 - General Purpose</span></h3>
+                        <p class="hardware-description" data-i18n="partner.hardware.atlasx1.desc">
+                            Versatile humanoid platform with advanced mobility, manipulation capabilities, and modular firmware support.
+                        </p>
+                        <div class="hardware-specs">
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.39_8514da6f">Payload Capacity:</span></span>
+                                <span class="spec-value">50kg</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.38_2434c70d">Battery Life:</span></span>
+                                <span class="spec-value"><span data-i18n="auto.partner.37_d34ac30b">12 hours</span></span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.36_f6f49f50">Compatible Modules:</span></span>
+                                <span class="spec-value">18/24</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.35_4778eb04">Active Units:</span></span>
+                                <span class="spec-value">89</span>
+                            </div>
+                        </div>
+                        <div class="firmware-actions">
+                            <a href="#specs" class="btn-secondary"><span data-i18n="auto.partner.34_7b6184ef">View Specs</span></a>
+                            <a href="#compatibility" class="btn-secondary"><span data-i18n="auto.partner.33_e143e4bd">Compatibility</span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hardware-card">
+                    <div class="hardware-image">
+                        <span>🏗️</span>
+                    </div>
+                    <div class="hardware-content">
+                        <h3 class="hardware-title"><span data-i18n="auto.partner.32_f601dfed">Atlas X2 Heavy - Industrial</span></h3>
+                        <p class="hardware-description" data-i18n="partner.hardware.atlasx2.desc">
+                            Heavy-duty humanoid designed for industrial applications, logistics, and high-payload operations.
+                        </p>
+                        <div class="hardware-specs">
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.31_8514da6f">Payload Capacity:</span></span>
+                                <span class="spec-value">100kg</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.30_2434c70d">Battery Life:</span></span>
+                                <span class="spec-value"><span data-i18n="auto.partner.29_3091a639">16 hours</span></span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.28_f6f49f50">Compatible Modules:</span></span>
+                                <span class="spec-value">12/24</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.27_4778eb04">Active Units:</span></span>
+                                <span class="spec-value">45</span>
+                            </div>
+                        </div>
+                        <div class="firmware-actions">
+                            <a href="#specs" class="btn-secondary"><span data-i18n="auto.partner.26_7b6184ef">View Specs</span></a>
+                            <a href="#compatibility" class="btn-secondary"><span data-i18n="auto.partner.25_e143e4bd">Compatibility</span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hardware-card">
+                    <div class="hardware-image">
+                        <span>🏥</span>
+                    </div>
+                    <div class="hardware-content">
+                        <h3 class="hardware-title"><span data-i18n="auto.partner.24_2e1e135c">Atlas Care-1 - Healthcare</span></h3>
+                        <p class="hardware-description" data-i18n="partner.hardware.atlascare.desc">
+                            Specialized humanoid for healthcare applications with gentle manipulation and medical monitoring capabilities.
+                        </p>
+                        <div class="hardware-specs">
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.23_8514da6f">Payload Capacity:</span></span>
+                                <span class="spec-value">30kg</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.22_2434c70d">Battery Life:</span></span>
+                                <span class="spec-value"><span data-i18n="auto.partner.21_bc06f6a4">14 hours</span></span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.20_f6f49f50">Compatible Modules:</span></span>
+                                <span class="spec-value">15/24</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><span data-i18n="auto.partner.19_4778eb04">Active Units:</span></span>
+                                <span class="spec-value">67</span>
+                            </div>
+                        </div>
+                        <div class="firmware-actions">
+                            <a href="#specs" class="btn-secondary"><span data-i18n="auto.partner.18_7b6184ef">View Specs</span></a>
+                            <a href="#compatibility" class="btn-secondary"><span data-i18n="auto.partner.17_e143e4bd">Compatibility</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="compatibility-section">
+            <h2 style="margin-bottom: 2rem; color: #333;"><span data-i18n="auto.partner.16_a2d8b3f6">Module Compatibility Matrix</span></h2>
+            <div class="compatibility-grid">
+                <div class="compatibility-item compatible">
+                    <div class="compatibility-icon">✅</div>
+                    <div class="compatibility-name"><span data-i18n="auto.partner.15_5f272e68">Culinary Arts</span></div>
+                    <div><span data-i18n="auto.partner.14_ee31e0d5">Compatible with Atlas X1, Care-1</span></div>
+                </div>
+
+                <div class="compatibility-item compatible">
+                    <div class="compatibility-icon">✅</div>
+                    <div class="compatibility-name"><span data-i18n="auto.partner.13_d04c55c4">Healthcare Companion</span></div>
+                    <div><span data-i18n="auto.partner.12_a81c2767">Compatible with Care-1, X1</span></div>
+                </div>
+
+                <div class="compatibility-item compatible">
+                    <div class="compatibility-icon">✅</div>
+                    <div class="compatibility-name"><span data-i18n="auto.partner.11_d82acf30">Logistics Optimizer</span></div>
+                    <div><span data-i18n="auto.partner.10_f6172009">Compatible with X2 Heavy, X1</span></div>
+                </div>
+
+                <div class="compatibility-item incompatible">
+                    <div class="compatibility-icon">❌</div>
+                    <div class="compatibility-name"><span data-i18n="auto.partner.9_4b97d5d1">Heavy Machinery Control</span></div>
+                    <div><span data-i18n="auto.partner.8_2a54b026">Requires specialized hardware</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="analytics-section">
+            <div class="analytics-header">
+                <h2 style="margin: 0; color: #333;"><span data-i18n="auto.partner.7_6d404052">Performance Analytics</span></h2>
+                <a href="#full-analytics" class="btn-primary"><span data-i18n="auto.partner.6_3161ea77">View Full Report</span></a>
+            </div>
+
+            <div class="analytics-metrics">
+                <div class="metric-item">
+                    <div class="metric-value">89%</div>
+                    <div class="metric-label"><span data-i18n="auto.partner.5_f40a9949">Module Success Rate</span></div>
+                </div>
+
+                <div class="metric-item">
+                    <div class="metric-value">4.7★</div>
+                    <div class="metric-label"><span data-i18n="auto.partner.4_ac84df7e">Average User Rating</span></div>
+                </div>
+
+                <div class="metric-item">
+                    <div class="metric-value">156</div>
+                    <div class="metric-label"><span data-i18n="auto.partner.3_bab8fdcc">Active Deployments</span></div>
+                </div>
+
+                <div class="metric-item">
+                    <div class="metric-value">+23%</div>
+                    <div class="metric-label"><span data-i18n="auto.partner.2_76fb9c86">Monthly Growth</span></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><span data-i18n="auto.partner.1_74eee820">@HumXus 2025 - Humanoid Services Platform</span></p>
+    </footer>
+
+    <!-- i18n and Custom JavaScript -->
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/script.js"></script>
+    <script>const currentPage = 'partner'; document.querySelectorAll('.nav-left a, .nav-right a, #mobile-menu a').forEach(link => { if (link.classList.contains('nav-' + currentPage)) { link.classList.add('active'); } });</script>
+</body>
+</html>

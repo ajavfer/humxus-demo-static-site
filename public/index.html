@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Prevent browsers (e.g., Samsung Internet) from forcing a dark theme -->
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Security headers are set by the server as HTTP response headers -->
+
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000, must-revalidate">
+
+    <title data-i18n="auto.index.1_741a7715">HumXus - Humanoid Services On Demand</title>
+
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://unpkg.com/;
+        style-src 'self' 'unsafe-inline' https://unpkg.com/;
+        img-src 'self' data: https:;
+        font-src 'self' https:;
+        connect-src 'self' https://nominatim.openstreetmap.org/;
+        child-src 'self';
+        object-src 'none';
+        media-src 'self' https:;
+        frame-src 'none';
+        form-action 'self';
+    ">
+
+    <!-- Custom CSS -->
+    <!-- Favicon -->
+    <link rel="icon" href="/static/images/HumXus_logo.png" type="image/png">
+    <link rel="stylesheet" href="/static/css/style.css" id="test-css">
+    <style>
+        body {
+            background-color: #f0f0f0 !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-left">
+                <ul>
+                    <li><a href="/index.html" class="active"><img src="/static/images/HumXus_logo.png" alt="HumXus" data-i18n-alt="home.brand"></a></li>
+                    <li><a href="/user.html" data-i18n="nav.user">User</a></li>
+                    <li><a href="/master.html" data-i18n="nav.master">Master</a></li>
+                    <li><a href="/partner.html" data-i18n="nav.partner">Partner</a></li>
+                </ul>
+            </div>
+
+            <button class="hamburger-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-menu" data-i18n-aria="nav.menu.toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="nav-right">
+                <ul>
+                    <li><a href="/login.html" data-i18n="nav.login">Login</a></li>
+                    <li><a href="/signup.html" class="btn-signup" data-i18n="nav.signup">Sign up</a></li>
+                    <li class="language-dropdown" id="language-dropdown">
+                        <a href="#language" class="language-icon" aria-haspopup="true" aria-expanded="false">🌐</a>
+                        <div class="dropdown-content" role="menu" aria-label="Language selector" data-i18n-aria="nav.language.selector">
+                            <a href="#" class="language-option active" data-lang="en" role="menuitem" tabindex="0"><span data-i18n="auto._header.3_b3310cb4">English</span></a>
+                            <a href="#" class="language-option" data-lang="yue" role="menuitem" tabindex="0"><span data-i18n="auto._header.2_33e28f52">Cantonese (廣州話)</span></a>
+                            <a href="#" class="language-option" data-lang="zh" role="menuitem" tabindex="0"><span data-i18n="auto._header.1_99c47543">Putonghua (普通话)</span></a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <ul id="mobile-menu" class="mobile-menu">
+                <li><a href="/index.html" class="active"><img src="/static/images/HumXus_logo.png" alt="HumXus" data-i18n-alt="home.brand"></a></li>
+                <li><a href="/user.html" data-i18n="nav.user">User</a></li>
+                <li><a href="/master.html" data-i18n="nav.master">Master</a></li>
+                <li><a href="/partner.html" data-i18n="nav.partner">Partner</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+    <main>
+
+    <!-- Full-width hero banner (breaks out of the container to span page) -->
+    <section class="hero-banner">
+        <div class="hero-content">
+            <h1 data-i18n="home.hero.title">Humanoid Services On Demand</h1>
+            <p class="hero-sub" data-i18n="home.hero.sub">Book your helpful assistant for any occasion, anytime, anywhere.</p>
+            <!-- Decorative/branding banner only; explanatory text moved below the banner into a compact content block -->
+        </div>
+    </section>
+
+    <!-- Content block immediately below the full-width banner -->
+    <section class="hero-blurb container">
+        <div class="hero-blurb-inner">
+
+            <p>
+                <span data-i18n="home.lead.pre">From frontline hospitality to precision logistics and compassionate elderly care, </span>
+                <span class="highlight" data-i18n="home.brand">HumXus</span>
+                <span data-i18n="home.lead.post"> provides trained humanoid assistants tailored to your needs.</span>
+            </p>
+
+            <p data-i18n="home.lead2">Available on-demand — we bring automation with a human touch.</p>
+
+            <ul class="hero-features" aria-hidden="false">
+                <li class="feature-item" data-i18n="home.feature.trusted">🤝 Trusted operators & secure deployments</li>
+                <li class="feature-item" data-i18n="home.feature.apps">🧰 A myriad of applications just waiting for you</li>
+                <li class="feature-item" data-i18n="home.feature.rapid">⚡ Rapid same-day dispatch for urgent jobs</li>
+            </ul>
+
+            <div class="hero-cta">
+                <a href="/user.html" class="btn-signup" data-i18n="home.cta.book">Book Now</a>
+                <a href="#services" class="btn-secondary" style="margin-left:12px;" data-i18n="home.cta.explore">Explore Services</a>
+            </div>
+        </div>
+    </section>
+
+        <section id="services" class="use-cases-section container">
+            <h2 data-i18n="home.services.title">Explore Our Services</h2>
+            <div class="use-cases-grid">
+                <a href="/user.html#foodservice" class="use-case-item">
+                    <img src="/static/images/foodservice.jpg" alt="Cooking/Working in a restaurant" class="use-case-image" data-i18n-alt="usecase.foodservice">
+                    <p data-i18n="usecase.foodservice">Foodservice</p>
+                </a>
+                <a href="/user.html#entertainment" class="use-case-item">
+                    <img src="/static/images/parties.jpg" alt="Entertainment at a party" class="use-case-image" data-i18n-alt="usecase.parties">
+                    <p data-i18n="usecase.parties">Parties</p>
+                </a>
+                <a href="/user.html#hospitality" class="use-case-item">
+                    <img src="/static/images/hospitality.jpg" alt="Working in a hotel" class="use-case-image" data-i18n-alt="usecase.hospitality">
+                    <p data-i18n="usecase.hospitality">Hospitality</p>
+                </a>
+                <a href="/user.html#assistant" class="use-case-item">
+                    <img src="/static/images/companion.jpg" alt="Providing companionship" class="use-case-image" data-i18n-alt="usecase.companion">
+                    <p data-i18n="usecase.companion">Companion</p>
+                </a>
+                <a href="/user.html#assistant" class="use-case-item">
+                    <img src="/static/images/assistant.jpg" alt="Helping with household tasks" class="use-case-image" data-i18n-alt="usecase.assistant">
+                    <p data-i18n="usecase.assistant">Assistant</p>
+                </a>
+                <a href="/user.html#logistics" class="use-case-item">
+                    <img src="/static/images/loading_unloading.jpg" alt="Loading or unloading packages" class="use-case-image" data-i18n-alt="usecase.loading">
+                    <p data-i18n="usecase.loading">Loading/Unloading</p>
+                </a>
+                <a href="/user.html#elderly-care" class="use-case-item">
+                    <img src="/static/images/elderly_care.jpg" alt="Providing assistance to an elderly person" class="use-case-image" data-i18n-alt="usecase.elderly">
+                    <p data-i18n="usecase.elderly">Elderly Care</p>
+                </a>
+                <a href="/user.html#entertainment" class="use-case-item">
+                    <img src="/static/images/variety_show.jpg" alt="Performing on stage at a show" class="use-case-image" data-i18n-alt="usecase.variety">
+                    <p data-i18n="usecase.variety">Variety Show</p>
+                </a>
+            </div>
+        </section>
+        </main>
+
+    <footer>
+        <p data-i18n="footer.copyright">@HumXus 2025</p>
+    </footer>
+
+    <!-- i18n and Custom JavaScript -->
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/script.js"></script>
+    <script>
+        // Set active nav based on current page
+        const currentPage = 'home';
+        document.querySelectorAll('.nav-left a, .nav-right a, #mobile-menu a').forEach(link => {
+            if (link.classList.contains('nav-' + currentPage)) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

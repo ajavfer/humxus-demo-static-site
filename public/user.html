@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Security headers are set by the server as HTTP response headers -->
+
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000, must-revalidate">
+
+    <title data-i18n="auto.user.64_eaf26229">HumXus - User Dashboard</title>
+
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://unpkg.com/;
+        style-src 'self' 'unsafe-inline' https://unpkg.com/;
+        img-src 'self' data: https:;
+        font-src 'self' https:;
+        connect-src 'self' https://nominatim.openstreetmap.org/;
+        child-src 'self';
+        object-src 'none';
+        media-src 'self' https:;
+        frame-src 'none';
+        form-action 'self';
+    ">
+
+    <!-- Custom CSS -->
+    <!-- Favicon -->
+    <link rel="icon" href="/static/images/HumXus_logo.png" type="image/png">
+    <link rel="stylesheet" href="/static/css/style.css" id="main-css">
+    <style>
+        body {
+            background-color: #f8f9fa !important;
+        }
+
+        .user-dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .dashboard-header h1 {
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .dashboard-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .action-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .action-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .action-card h3 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .action-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .service-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .service-content {
+            padding: 1.5rem;
+        }
+
+        .service-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .service-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .service-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .service-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .service-rating {
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+
+        .booking-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .booking-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .active-bookings {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .booking-item {
+            border-bottom: 1px solid #e1e5e9;
+            padding: 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .booking-item:last-child {
+            border-bottom: none;
+        }
+
+        .booking-info h4 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .booking-info p {
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .booking-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        @media (max-width: 768px) {
+            .user-dashboard {
+                padding: 1rem;
+            }
+
+            .dashboard-header {
+                padding: 1.5rem;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-left">
+                <ul>
+                    <li><a href="/index.html"><img src="/static/images/HumXus_logo.png" alt="HumXus" data-i18n-alt="home.brand"></a></li>
+                    <li><a href="/user.html" class="active" data-i18n="nav.user">User</a></li>
+                    <li><a href="/master.html" data-i18n="nav.master">Master</a></li>
+                    <li><a href="/partner.html" data-i18n="nav.partner">Partner</a></li>
+                </ul>
+            </div>
+
+            <button class="hamburger-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-menu" data-i18n-aria="nav.menu.toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="nav-right">
+                <ul>
+                    <li><a href="/login.html" data-i18n="nav.login">Login</a></li>
+                    <li><a href="/signup.html" class="btn-signup" data-i18n="nav.signup">Sign up</a></li>
+                    <li class="language-dropdown" id="language-dropdown">
+                        <a href="#language" class="language-icon" aria-haspopup="true" aria-expanded="false">🌐</a>
+                        <div class="dropdown-content" role="menu" aria-label="Language selector" data-i18n-aria="nav.language.selector">
+                            <a href="#" class="language-option active" data-lang="en" role="menuitem" tabindex="0"><span data-i18n="auto._header.3_b3310cb4">English</span></a>
+                            <a href="#" class="language-option" data-lang="yue" role="menuitem" tabindex="0"><span data-i18n="auto._header.2_33e28f52">Cantonese (廣州話)</span></a>
+                            <a href="#" class="language-option" data-lang="zh" role="menuitem" tabindex="0"><span data-i18n="auto._header.1_99c47543">Putonghua (普通话)</span></a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <ul id="mobile-menu" class="mobile-menu">
+                <li><a href="/index.html"><img src="/static/images/HumXus_logo.png" alt="HumXus" data-i18n-alt="home.brand"></a></li>
+                <li><a href="/user.html" class="active" data-i18n="nav.user">User</a></li>
+                <li><a href="/master.html" data-i18n="nav.master">Master</a></li>
+                <li><a href="/partner.html" data-i18n="nav.partner">Partner</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+    <main class="user-dashboard">
+        <div class="dashboard-header">
+            <h1 data-i18n="user.header.title">Humanoid Services Dashboard</h1>
+            <p data-i18n="user.header.subtitle">Access advanced humanoid capabilities on-demand for your business needs</p>
+        </div>
+
+        <div class="quick-actions">
+            <div class="action-card">
+                <span class="icon">🔍</span>
+                <h3 data-i18n="user.actions.browse.title">Browse Services</h3>
+                <p data-i18n="user.actions.browse.desc">Explore available humanoid capabilities and skill modules</p>
+                <a href="#services" class="btn-primary" data-i18n="user.actions.browse.cta">Browse Now</a>
+            </div>
+
+            <div class="action-card">
+                <span class="icon">📅</span>
+                <h3 data-i18n="user.actions.book.title">Book Humanoid</h3>
+                <p data-i18n="user.actions.book.desc">Schedule humanoid assistance for your specific needs</p>
+                <a href="#booking" class="btn-primary" data-i18n="user.actions.book.cta">Book Now</a>
+            </div>
+
+            <div class="action-card">
+                <span class="icon">📊</span>
+                <h3 data-i18n="user.actions.track.title">Track Bookings</h3>
+                <p data-i18n="user.actions.track.desc">Monitor your active bookings and service history</p>
+                <a href="#active-bookings" class="btn-primary" data-i18n="user.actions.track.cta">View Status</a>
+            </div>
+
+            <div class="action-card">
+                <span class="icon">⚙️</span>
+                <h3 data-i18n="user.custom.firmware_title">Custom Firmware</h3>
+                <p><span data-i18n="auto.user.63_5d35d571">Request specialized skill modules for unique tasks</span></p>
+                <a href="#custom" class="btn-primary"><span data-i18n="auto.user.62_0fc049ea">Request Custom</span></a>
+            </div>
+        </div>
+
+        <section id="services" class="services-grid">
+            <div id="foodservice" class="service-card">
+                <img src="/static/images/foodservice.jpg" alt="Food Service Humanoid" class="service-image" data-i18n-alt="auto.user.61_d99cd50e">
+                <div class="service-content">
+                    <h3 class="service-title"><span data-i18n="auto.user.61_d99cd50e">Food Service Assistant</span></h3>
+                    <p class="service-description"><span data-i18n="auto.user.60_a63f321a">Professional humanoid with culinary skills, food safety protocols, and customer service capabilities for restaurants and catering.</span></p>
+                    <div class="service-meta">
+                        <span class="service-price"><span data-i18n="auto.user.59_867fb4b9">HKD 2,000/day</span></span>
+                        <span class="service-rating" data-i18n="user.services.foodservice.rating">★★★★★ (4.8)</span>
+                    </div>
+                    <a href="#book" class="btn-primary"><span data-i18n="auto.user.58_106f553e">Book Now</span></a>
+                </div>
+            </div>
+
+            <div id="hospitality" class="service-card">
+                <img src="/static/images/hospitality.jpg" alt="Hospitality Humanoid" class="service-image" data-i18n-alt="auto.user.57_a5a356ae">
+                <div class="service-content">
+                    <h3 class="service-title"><span data-i18n="auto.user.57_a5a356ae">Hotel & Hospitality</span></h3>
+                    <p class="service-description"><span data-i18n="auto.user.56_21e1cf00">Multi-lingual humanoid with concierge skills, room service, and guest assistance capabilities for hotels and resorts.</span></p>
+                    <div class="service-meta">
+                        <span class="service-price"><span data-i18n="auto.user.55_dece664e">HKD 1,800/day</span></span>
+                        <span class="service-rating" data-i18n="user.services.hospitality.rating">★★★★★ (4.7)</span>
+                    </div>
+                    <a href="#book" class="btn-primary"><span data-i18n="auto.user.54_106f553e">Book Now</span></a>
+                </div>
+            </div>
+
+            <div id="assistant" class="service-card">
+                <img src="/static/images/assistant.jpg" alt="Personal Assistant Humanoid" class="service-image" data-i18n-alt="auto.user.53_eb0d18c2">
+                <div class="service-content">
+                    <h3 class="service-title"><span data-i18n="auto.user.53_eb0d18c2">Personal Assistant</span></h3>
+                    <p class="service-description"><span data-i18n="auto.user.52_4b6c9905">Versatile humanoid with administrative skills, scheduling, and household management capabilities.</span></p>
+                    <div class="service-meta">
+                        <span class="service-price"><span data-i18n="auto.user.51_c8430f0d">HKD 1,000/day</span></span>
+                        <span class="service-rating" data-i18n="user.services.assistant.rating">★★★★☆ (4.5)</span>
+                    </div>
+                    <a href="#book" class="btn-primary"><span data-i18n="auto.user.50_106f553e">Book Now</span></a>
+                </div>
+            </div>
+
+            <div id="elderly-care" class="service-card">
+                <img src="/static/images/elderly_care.jpg" alt="Elderly Care Humanoid" class="service-image" data-i18n-alt="auto.user.49_567c7453">
+                <div class="service-content">
+                    <h3 class="service-title"><span data-i18n="auto.user.49_567c7453">Elderly Care Specialist</span></h3>
+                    <p class="service-description"><span data-i18n="auto.user.48_ed929721">Compassionate humanoid with medical monitoring, mobility assistance, and companionship skills for elderly care.</span></p>
+                    <div class="service-meta">
+                        <span class="service-price"><span data-i18n="auto.user.47_93195f6d">HKD 2,200/day</span></span>
+                        <span class="service-rating" data-i18n="user.services.elderlycare.rating">★★★★★ (4.9)</span>
+                    </div>
+                    <a href="#book" class="btn-primary"><span data-i18n="auto.user.46_106f553e">Book Now</span></a>
+                </div>
+            </div>
+
+            <div id="logistics" class="service-card">
+                <img src="/static/images/loading_unloading.jpg" alt="Logistics Humanoid" class="service-image" data-i18n-alt="auto.user.45_f7c8e430">
+                <div class="service-content">
+                    <h3 class="service-title"><span data-i18n="auto.user.45_f7c8e430">Logistics & Warehousing</span></h3>
+                    <p class="service-description"><span data-i18n="auto.user.44_0559b797">Heavy-duty humanoid with inventory management, loading/unloading, and warehouse organization capabilities.</span></p>
+                    <div class="service-meta">
+                        <span class="service-price"><span data-i18n="auto.user.43_b7d65719">HKD 900/day</span></span>
+                        <span class="service-rating" data-i18n="user.services.logistics.rating">★★★★☆ (4.3)</span>
+                    </div>
+                    <a href="#book" class="btn-primary"><span data-i18n="auto.user.42_106f553e">Book Now</span></a>
+                </div>
+            </div>
+
+            <div id="entertainment" class="service-card">
+                <img src="/static/images/variety_show.jpg" alt="Entertainment Humanoid" class="service-image" data-i18n-alt="auto.user.41_274e821e">
+                <div class="service-content">
+                    <h3 class="service-title"><span data-i18n="auto.user.41_274e821e">Entertainment & Events</span></h3>
+                    <p class="service-description"><span data-i18n="auto.user.40_ff75dfaa">Charismatic humanoid with performance skills, music, dance, and interactive entertainment capabilities.</span></p>
+                    <div class="service-meta">
+                        <span class="service-price"><span data-i18n="auto.user.39_15edd88c">HKD 2,500/day</span></span>
+                        <span class="service-rating" data-i18n="user.services.entertainment.rating">★★★★★ (4.6)</span>
+                    </div>
+                    <a href="#book" class="btn-primary"><span data-i18n="auto.user.38_106f553e">Book Now</span></a>
+                </div>
+            </div>
+
+            <!-- Custom Requirements (added) -->
+            <div id="custom" class="service-card">
+                <img src="/static/images/general_case.jpg" alt="Custom Requirements" class="service-image" data-i18n-alt="auto.user.37_f81d617e">
+                <div class="service-content">
+                    <h3 class="service-title"><span data-i18n="auto.user.37_f81d617e">Custom Requirements</span></h3>
+                    <p class="service-description"><span data-i18n="auto.user.36_0b17c1e3">Have a unique task or workflow? Request a custom humanoid configuration, specialized firmware modules, or bespoke deployment plan tailored to your operational needs. Our team will assess requirements and provide a scoped solution.</span></p>
+                    <div class="service-meta">
+                        <span class="service-price"><span data-i18n="auto.user.35_39cad7e1">Contact for quote</span></span>
+                        <span class="service-rating">—</span>
+                    </div>
+                    <a href="/signup.html" class="btn-primary" data-i18n="user.custom.request_quote">Request Quote</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="booking" class="booking-section">
+            <h2 style="margin-bottom: 2rem; color: #333;" data-i18n="user.booking.title">Book a Humanoid Service</h2>
+            <form class="booking-form" action="#" method="post" aria-label="Booking form" data-i18n-aria="user.booking.aria_form">
+                <div class="form-group">
+                    <label for="service-type" data-i18n="user.booking.service_type">Service Type</label>
+                    <select id="service-type" name="service_type" required>
+                        <option value="" data-i18n="user.booking.service_type.placeholder">Select Service Type...</option>
+                        <option value="foodservice" data-price="2000" data-i18n="auto.user.34_cadc3a46">Food Service</option>
+                        <option value="hospitality" data-price="1800" data-i18n="auto.user.33_5458b2ac">Hospitality</option>
+                        <option value="assistant" data-price="1000" data-i18n="auto.user.32_eb0d18c2">Personal Assistant</option>
+                        <option value="elderly-care" data-price="2200" data-i18n="auto.user.31_e723a2bb">Elderly Care</option>
+                        <option value="logistics" data-price="900" data-i18n="auto.user.30_f7c8e430">Logistics & Warehousing</option>
+                        <option value="entertainment" data-price="2500" data-i18n="auto.user.29_274e821e">Entertainment & Events</option>
+                        <option value="custom" data-i18n="auto.user.37_f81d617e">Custom Requirements</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="location-input" data-i18n="user.booking.location">Location</label>
+                    <input type="text" id="location-input" name="location" data-i18n-placeholder="user.booking.location.placeholder" placeholder="Enter address or location" required autocomplete="street-address">
+                </div>
+
+                <div class="form-group">
+                    <label for="contact-email" data-i18n="user.booking.contact_email">Contact Email</label>
+                    <input type="email" id="contact-email" name="contact_email" placeholder="you@example.com" required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="contact-phone" data-i18n="user.booking.contact_phone">Contact Telephone</label>
+                    <input type="tel" id="contact-phone" name="contact_phone" placeholder="+852 1234 5678" pattern="[+0-9 ()-]{7,20}" required autocomplete="tel">
+                </div>
+
+                <div class="form-group">
+                    <label for="start-date" data-i18n="user.booking.start_datetime">Start Date & Time</label>
+                    <input type="datetime-local" id="start-date" name="start_datetime" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="end-date" data-i18n="user.booking.end_datetime">End Date & Time</label>
+                    <input type="datetime-local" id="end-date" name="end_datetime" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="special-requirements" data-i18n="user.booking.special_requirements">Special Requirements or Firmware Modules</label>
+                    <textarea id="special-requirements" name="special_requirements" rows="4" placeholder="Describe specific skills, languages, or custom firmware needed..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="urgency" data-i18n="user.booking.urgency">Urgency Level</label>
+                    <select id="urgency" name="urgency">
+                        <option value="standard" data-i18n="user.booking.urgency.standard">Standard (24-48 hours)</option>
+                        <option value="urgent" data-i18n="auto.user.28_4188ada6">Urgent (Same day)</option>
+                        <option value="emergency" data-i18n="auto.user.27_7d244e1f">Emergency (Within hours)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2; text-align: center; margin-top: 1rem;">
+                    <button type="submit" class="btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;" data-i18n="user.booking.submit">Submit Booking Request</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="active-bookings" class="active-bookings">
+            <h2 style="margin-bottom: 2rem; color: #333;" data-i18n="user.bookings.title">Active Bookings</h2>
+
+            <div class="booking-item">
+                <div class="booking-info">
+                    <h4><span data-i18n="auto.user.25_e2ecb720">Food Service - Central Restaurant</span></h4>
+                    <p>
+                        <strong><span data-i18n="user.bookings.duration_label">Duration</span>:</strong> <span data-i18n="auto.user.23_50066d23">Dec 15-16, 2025</span>
+                    </p>
+                    <p>
+                        <strong><span data-i18n="user.bookings.location_label">Location</span>:</strong> <span data-i18n="auto.user.21_5161f8ef">Central, Hong Kong</span>
+                    </p>
+                    <p>
+                        <strong><span data-i18n="user.bookings.humanoid_id_label">Humanoid ID</span>:</strong> <span data-i18n="auto.user.20_7d6e4a60">HSP-001</span> (<span data-i18n="auto.user.19_a3c35879">★★★★★ (4.9)</span>)
+                    </p>
+                </div>
+                <div class="booking-status status-active">
+                    <span data-i18n="user.bookings.status.active">Active</span>
+                </div>
+            </div>
+
+            <div class="booking-item">
+                <div class="booking-info">
+                    <h4><span data-i18n="auto.user.17_832b49e8">Hospitality - Hotel Grand</span></h4>
+                    <p>
+                        <strong><span data-i18n="user.bookings.duration_label">Duration</span>:</strong> <span data-i18n="auto.user.15_f2617b52">Dec 18-20, 2025</span>
+                    </p>
+                    <p>
+                        <strong><span data-i18n="user.bookings.location_label">Location</span>:</strong> <span data-i18n="auto.user.13_73916b4a">Tsim Sha Tsui, Hong Kong</span>
+                    </p>
+                    <p>
+                        <strong><span data-i18n="user.bookings.humanoid_id_label">Humanoid ID</span>:</strong> <span data-i18n="auto.user.12_7d6e4a60">HSP-002</span> (<span data-i18n="auto.user.11_c84a6512">★★★★☆ (4.7)</span>)
+                    </p>
+                </div>
+                <div class="booking-status status-pending">
+                    <span data-i18n="user.bookings.status.pending">Pending Approval</span>
+                </div>
+            </div>
+
+            <div class="booking-item">
+                <div class="booking-info">
+                    <h4><span data-i18n="auto.user.9_77d8e4ee">Elderly Care - Harmony Home</span></h4>
+                    <p>
+                        <strong><span data-i18n="user.bookings.duration_label">Duration</span>:</strong> <span data-i18n="auto.user.7_626c797a">Dec 10-12, 2025</span>
+                    </p>
+                    <p>
+                        <strong><span data-i18n="user.bookings.location_label">Location</span>:</strong> <span data-i18n="auto.user.5_b7a84a59">Kowloon, Hong Kong</span>
+                    </p>
+                    <p>
+                        <strong><span data-i18n="user.bookings.humanoid_id_label">Humanoid ID</span>:</strong> <span data-i18n="auto.user.4_7d6e4a60">HSP-003</span> (<span data-i18n="auto.user.3_a2d5877d">★★★★★ (4.8)</span>)
+                    </p>
+                </div>
+                <div class="booking-status status-completed">
+                    <span data-i18n="user.bookings.status.completed">Completed</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><span data-i18n="auto.user.1_6eeaa8bc">@HumXus 2025 - Humanoid Services Platform</span></p>
+    </footer>
+
+    <!-- i18n and Custom JavaScript -->
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/script.js"></script>
+    <script>
+        // Set active nav based on current page
+        const currentPage = 'user';
+        document.querySelectorAll('.nav-left a, .nav-right a, #mobile-menu a').forEach(link => {
+            if (link.classList.contains('nav-' + currentPage)) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

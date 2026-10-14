@@ -1,0 +1,848 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f0f0f0;
+}
+
+/* Add this class to prevent body scroll when menu is open */
+.body-no-scroll {
+    overflow: hidden;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1003;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative; /* Crucial for positioning the mobile menu */
+}
+
+/* Hide desktop nav links by default */
+.nav-left,
+.nav-right {
+    display: none;
+}
+
+/* Show the hamburger button by default */
+.hamburger-btn {
+    display: block; /* It's visible on mobile */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 1005; /* Ensure it's above other header content and overlays */
+    position: relative; /* makes z-index effective across browsers */
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 22px;
+    height: 3px;
+    background: #2c3e50;
+    margin: 4px 0;
+}
+
+/* --- Mobile Menu & Overlay (CSS-first approach) --- */
+
+/* Overlay: hidden by default, shown when body has state class */
+.menu-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001; /* above page content */
+}
+
+.mobile-menu {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 80%;
+    background: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    padding: 1rem;
+    z-index: 1004; /* ensure menu sits above the overlay and header (header=1003) */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    visibility: hidden;
+}
+
+/* When JS toggles this class on body, the overlay and menu become visible */
+body.mobile-menu-is-open .menu-overlay {
+    display: block;
+}
+
+body.mobile-menu-is-open .mobile-menu {
+    transform: translateX(0);
+    visibility: visible;
+}
+
+/* Navigation Right Section */
+
+.nav-right .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-decoration: none;
+    color: #2c3e50;
+    position: relative;
+}
+
+.nav-right .nav-link:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.nav-right .nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-right .nav-link:hover::before {
+    width: 100%;
+}
+
+.nav-left ul:not(.mobile-menu),
+.nav-right ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure the mobile-only menu is hidden by default on larger screens.
+   It is only shown when the container has .mobile-menu-open (and on mobile
+   media queries the rule below will present it properly). This prevents the
+   mobile menu (a block <ul>) from appearing as a vertical bulleted list on desktop. */
+
+
+.nav-left li,
+.nav-right li {
+    margin: 0 0.75rem;
+}
+
+.nav-left li:first-child {
+    margin-left: 0;
+}
+
+.nav-right li:last-child {
+    margin-right: 0;
+}
+
+nav a {
+    text-decoration: none;
+    color: #2c3e50;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    position: relative;
+}
+
+nav a:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Active nav link styling */
+nav a.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 8px 30px rgba(102,126,234,0.18);
+    transform: translateY(-2px);
+}
+
+.btn-signup {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    border: none;
+    transition: all 0.3s ease !important;
+}
+
+.btn-signup:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* On screens 769px and wider, apply desktop styles */
+@media screen and (min-width: 769px) {
+    .nav-container {
+        padding: 1rem 2rem;
+    }
+
+    /* Show the desktop nav links */
+    .nav-left,
+    .nav-right {
+        display: flex;
+    }
+
+    /* Hide the hamburger button on desktop */
+    .hamburger-btn {
+        display: none;
+    }
+
+    /* We don't need the mobile menu wrapper on desktop */
+    .mobile-menu {
+        display: none !important;
+    }
+
+    /* Pin the right-side controls to the top-right of the header */
+    .nav-right {
+        position: absolute;
+        right: 1.5rem;
+        top: 0.6rem;
+        height: calc(100% - 1.2rem);
+    }
+}
+
+/* Logo Styling */
+nav a img {
+    height: 45px;
+    width: auto;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+nav a:hover img {
+    transform: scale(1.05);
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+
+/* Main Content */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    width: 100%;
+}
+
+/* Hero Section */
+.hero-section {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 32px;
+    align-items: center;
+    padding: 36px;
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+.hero-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.hero-image {
+    width: 100%;
+    border-radius: 6px;
+    object-fit: cover;
+}
+.hero-caption {
+    font-size: 0.95rem;
+    color: #3b3b3b;
+}
+
+/* Full-width hero banner that breaks out of the centered container */
+.hero-banner {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+    min-height: 320px;
+    /* Background image + dark gradient overlay for hero banner.
+       Using a static path here avoids templating tokens inside inline CSS
+       so editor/linters don't get confused. */
+    background-image: linear-gradient(rgba(19,24,28,0.28), rgba(19,24,28,0.28)), url('/static/images/HumXus_index_image.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    /* subtle inner contrast (the inline style already adds a dark gradient, this keeps text readable) */
+    padding: 48px 0;
+}
+.hero-banner .hero-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    color: #fff;
+}
+.hero-banner h1,
+.hero-banner .hero-sub,
+.hero-banner .hero-intro,
+.hero-banner .hero-features {
+    color: #fff;
+}
+.hero-banner .hero-sub {
+    opacity: 0.95;
+}
+.hero-banner .hero-intro {
+    opacity: 0.9;
+}
+.hero-banner .hero-features {
+    margin-top: 16px;
+}
+
+@media (max-width: 800px) {
+    .hero-banner { padding: 36px 0; min-height: 260px; }
+    .hero-banner .hero-content { padding: 0 16px; }
+}
+/* Nudge the hero text slightly to the right and a bit upward on larger screens so
+   it visually sits to the right of the humanoid's smile. Keep centered on small screens. */
+.hero-banner .hero-content {
+    position: relative;
+    /* move right using viewport-relative offset so it adapts to different widths */
+    /* increased horizontal offset so the heading starts right of the smile */
+    transform: translateX(12vw) translateY(-18px);
+}
+
+@media (min-width: 1400px) {
+    .hero-banner .hero-content {
+        /* larger screens get a stronger offset */
+        transform: translateX(16vw) translateY(-28px);
+    }
+}
+
+@media (max-width: 900px) {
+    /* Re-center on smaller screens to avoid clipping and preserve readability */
+    .hero-banner .hero-content {
+        transform: none;
+        margin-left: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+
+.hero-cta {
+    margin-top: 0.75rem;
+}
+
+.hero-cta .btn-signup {
+    padding: 0.75rem 1.8rem;
+    border-radius: 999px;
+    font-size: 1rem;
+    box-shadow: 0 8px 30px rgba(102,126,234,0.12);
+}
+
+.hero-cta .btn-signup:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(102,126,234,0.18);
+}
+
+/* Hero layout: split visual + content on larger screens */
+.hero-section {
+    display: grid;
+    grid-template-columns: 1fr 360px; /* narrower visual column for better balance */
+    gap: 2rem;
+    align-items: center;
+    text-align: left;
+}
+
+.hero-content {
+    padding-right: 1rem;
+    max-width: 680px;
+}
+
+.hero-visual {
+    display: flex;
+    flex-direction: column; /* stack image and caption vertically */
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image {
+    width: 100%;
+    max-width: 320px; /* reduced to keep illustration from being too dominant */
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(31,41,55,0.08);
+}
+
+/* Caption under hero visual */
+.hero-caption {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: #5b6b78;
+    text-align: center;
+    max-width: 320px;
+}
+
+/* Highlighted phrase styling (global) */
+.highlight {
+    background: linear-gradient(90deg, rgba(102,126,234,0.14), rgba(118,75,162,0.12));
+    color: #2b2b2b;
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+/* Backwards-compatible selector for caption-scoped highlights (keeps previous specificity) */
+/* .hero-caption .highlight removed (uses global .highlight rules) */
+
+.hero-features {
+    list-style: none;
+    display: flex;
+    gap: 1rem 1rem;
+    flex-wrap: wrap;
+    /* increase bottom margin so CTAs sit visibly below the feature chips */
+    margin: 1rem 0 1.25rem;
+    padding: 0;
+}
+
+.feature-item {
+    background: rgba(102,126,234,0.06);
+    color: #374151;
+    padding: 0.5rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+}
+
+/* Subtle entrance animation */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-content > * { animation: fadeUp 520ms ease both; }
+.hero-content > * { animation-delay: 60ms; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .hero-content > * { animation: none; }
+}
+
+/* Interaction Container */
+.interaction-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 100%;
+}
+
+.input-window {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.input-window label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.input-window input,
+.input-window select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+}
+
+/* Date and Time Group */
+.date-time-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* Date Pair Container */
+.date-pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+/* Standardize input styling */
+.input-window input,
+.date-pair input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+/* Add spacing between date and time inputs */
+.date-pair input:not(:last-child) {
+    margin-bottom: 0.5rem;
+}
+
+/* Add gap between date and time pairs */
+.date-pair:first-child {
+    margin-right: 10px; /* Gap between columns */
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .date-time-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .date-pair {
+        width: 100%;
+    }
+}
+
+/* Language Selection */
+.language-dropdown {
+    position: relative;
+}
+
+.language-icon {
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.language-icon:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: scale(1.1);
+}
+
+.dropdown-content {
+    /* Use transform/opacity for smoother entrance and to avoid layout reflows
+       which sometimes cause pointer capture issues when rapidly moving the
+       mouse. Pointer-events are disabled when hidden to avoid accidental
+       blocking of underlying elements. */
+    display: block; /* presence maintained; we control visibility via opacity */
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    min-width: 180px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 0.5rem 0;
+    z-index: 10050; /* make sure it sits above header overlays */
+    border: 1px solid rgba(0,0,0,0.05);
+    transform: translateY(-8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 180ms ease, opacity 180ms ease;
+}
+
+/* Show dropdown when hovered or when JS toggles the .open class */
+.language-dropdown:hover .dropdown-content,
+.language-dropdown.open .dropdown-content {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.language-option {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: #2c3e50;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.language-option:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.language-option.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+}
+
+/* Error Message */
+.error-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #ff4444;
+    color: white;
+    padding: 1rem;
+    border-radius: 4px;
+    z-index: 9999;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Footer */
+footer {
+    padding: 0.5rem 2rem;
+    background: #f5f6f7;
+    text-align: center;
+    color: #666;
+}
+
+/* Ensure anchored service cards are scrolled into view below the sticky header */
+.user-dashboard [id],
+.services-grid .service-card {
+    /* large enough to clear the header + some breathing room */
+    scroll-margin-top: 96px;
+}
+
+@media (max-width: 768px) {
+    /* header is smaller on mobile, reduce offset */
+    .user-dashboard [id],
+    .services-grid .service-card {
+        scroll-margin-top: 72px;
+    }
+
+    /* Ensure banner content is not covered by mobile menu */
+    .hero-banner {
+        scroll-margin-top: 120px; /* Account for potential mobile menu height */
+        padding-top: 1rem; /* Add top padding to prevent overlap */
+    }
+
+    /* Additional spacing for pages with mobile menu */
+    body:has(.nav-container.mobile-menu-open) .hero-banner {
+        padding-top: 2rem;
+    }
+}
+
+/* Use Cases Grid */
+.use-cases-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.use-case-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.use-case-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Slight scale on image hover for more polish */
+.use-case-image {
+    transition: transform 0.35s ease, filter 0.35s ease;
+}
+.use-case-item:hover .use-case-image {
+    transform: scale(1.03);
+    filter: brightness(0.98) saturate(1.02);
+}
+
+.use-case-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.use-case-item p {
+    margin: 0;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* Responsive Grid */
+@media screen and (max-width: 1024px) {
+    .use-cases-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(4, auto);
+    }
+    .hero-section { grid-template-columns: 1fr; gap: 1rem; text-align: center; }
+    .hero-content { padding: 0; }
+    .hero-visual { margin-bottom: 0.5rem; }
+}
+
+@media screen and (max-width: 480px) {
+    .use-cases-grid {
+        grid-template-columns: repeat(1, 1fr);
+        grid-template-rows: repeat(8, auto);
+    }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    body {
+        -webkit-text-size-adjust: 100%;
+        -moz-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+        zoom: 1;
+    }
+    
+    .hero-cta {
+        /* ensure there is clear separation between feature chips and CTAs */
+        margin-top: 1.25rem;
+        display: flex;
+        gap: 12px; /* consistent spacing between primary and secondary CTAs */
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-cta .btn-signup {
+        padding: 0.75rem 1.8rem;
+        border-radius: 999px;
+        font-size: 1rem;
+        box-shadow: 0 8px 30px rgba(102,126,234,0.12);
+    }
+
+    .hero-cta .btn-signup:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(102,126,234,0.18);
+    }
+    
+    .input-window {
+        margin-bottom: 0.125rem;
+    }
+    
+    .input-window label {
+        margin-bottom: 0.0625rem;
+    }
+    
+    .use-cases-grid {
+        gap: 0.25rem;
+    }
+    
+    .use-case-item {
+        padding: 0.25rem;
+        min-height: 180px;
+    }
+    
+    .use-case-image {
+        height: 110px;
+    }
+    
+    footer {
+        padding: 0.25rem 1rem;
+    }
+}
+
+/* Search Dropdown */
+.search-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-option {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-option:hover {
+    background-color: #f5f5f5;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+}
+
+/* Grid Layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+/* Card */
+.card {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Buttons */
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
